@@ -42,3 +42,35 @@ def get(school, class_):
     timetable = Calendar.make(lessons, monday)
     
     return timetable
+
+def get_teacher(school, teacher):
+    today = datetime.date.today()
+    monday = today + datetime.timedelta(days = -today.weekday())
+    if today.weekday() == 5 or today.weekday() == 6: # Saturday or Sunday
+        monday += datetime.timedelta(weeks = 1)
+            
+    session = requests.Session()
+    session.get("https://www.easistent.com")
+    
+    # Remove all cookies except "vxcaccess", as they cause further requests to be rejected.
+    for cookie in session.cookies:
+        name = cookie.name
+        if name != "vxcaccess":
+            session.cookies.pop(name)
+            
+    URL = "https://www.easistent.com/urniki/izpis/" + school
+    response = session.get(URL)
+    
+    (durations, lessons) = Parser.lessons(response.content)
+
+    lessons_copy = []
+
+    for day in lessons:
+        lessons_copy.append([])
+
+        for slot in day:
+            lessons_copy[-1].append([(subject, teach) for (subject, teach) in slot if teach == teacher])
+            
+    timetable = Calendar.make((durations, lessons_copy), monday)
+    
+    return timetable
