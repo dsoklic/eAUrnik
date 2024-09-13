@@ -6,9 +6,12 @@
 import Timetable
 from flask import Flask, request, make_response
 from flask_restful import Api, Resource, reqparse
+from flask_cors import CORS
 
 app = Flask(__name__)
 api = Api(app)
+
+CORS(app)
 
 @app.errorhandler(404)
 def page_not_found(e):
