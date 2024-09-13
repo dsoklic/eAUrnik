@@ -8,7 +8,7 @@ import Calendar
 import requests
 import datetime
 
-def get(school, class_, student):
+def get(school, class_):
     today = datetime.date.today()
     monday = today + datetime.timedelta(days = -today.weekday())
     if today.weekday() == 5 or today.weekday() == 6: # Saturday or Sunday
@@ -35,7 +35,7 @@ def get(school, class_, student):
         if name != "vxcaccess":
             session.cookies.pop(name)
             
-    URL = "https://www.easistent.com/urniki/izpis/" + school + "/" + str(class_) + "/0/0/0/" + str(week) + "/" + str(student)
+    URL = "https://www.easistent.com/urniki/izpis/" + school + "/" + str(class_) + "/0/0/0/" + str(week)
     response = session.get(URL)
     
     lessons = Parser.lessons(response.content)

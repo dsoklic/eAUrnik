@@ -20,9 +20,7 @@ def parse_block(block):
     if icon and icon[0].get("title") in ["JV", "PB"]:
         return
     if block.xpath("div"):
-        subtitle_unformatted = block.xpath("div")[0].text.strip()
-        subtitle_components = subtitle_unformatted.split(", ")
-        subtitle = subtitle_components[1] + ", " + subtitle_components[0]
+        subtitle= block.xpath("div")[0].text.strip()
     else:
         subtitle = ""
     return (title, subtitle)
@@ -46,16 +44,15 @@ def lessons(page):
         rows = []
         for j in range(1, len(coloumns)):
             cell = coloumns[j]
-            blocks = cell.xpath("div")
+
+            blocks = cell.xpath(".//div[contains(@class, 'ednevnik-seznam_ur_teden-urnik')]")
+            
             if not blocks:
                 rows.append([])
                 continue
+
             coloumn_lessons = []
-            parsed = parse_block(blocks[0])
-            if parsed:
-                coloumn_lessons = [parsed]
-            for k in range(1, len(blocks)):
-                block = blocks[k].xpath("div")[0]
+            for block in blocks:
                 parsed = parse_block(block)
                 if parsed:
                     coloumn_lessons.append(parsed)
