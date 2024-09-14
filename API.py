@@ -21,7 +21,7 @@ def page_not_found(e):
 
 @app.route("/urniki/<string:school>/razredi/<int:class_>")
 def get(school, class_):
-    timetable = Timetable.get(school, class_)
+    timetable = Timetable.get_class(school, class_)
     response = make_response(timetable, 200)
     response.headers["content-type"] = "text/calendar"
     return response

@@ -6,25 +6,42 @@
 import Parser
 import Calendar
 import requests
-import datetime
+from datetime import date, timedelta
 
-def get(school, class_):
-    today = datetime.date.today()
-    monday = today + datetime.timedelta(days = -today.weekday())
-    if today.weekday() == 5 or today.weekday() == 6: # Saturday or Sunday
-        monday += datetime.timedelta(weeks = 1)
+def get_monday(today):
+    """Returns the upcoming Monday. If today is Saturday or Sunday, return next Monday."""
+    monday = today - timedelta(days=today.weekday())  # Get current week's Monday
+    
+    # If it's the weekend, take next week.
+    if today.weekday() >= 5:
+        monday += timedelta(weeks=1)
 
-    schoolyear = today.year
-    if today.month < 8:
-        schoolyear -= 1
-    schoolyearStart = datetime.date(schoolyear, 9, 1)
-    while schoolyearStart.weekday() == 5 or schoolyearStart.weekday() == 6:
-        schoolyearStart += datetime.timedelta(days = 1)
+    return monday
 
-    week = 1
-    for i in range((monday - schoolyearStart).days):
-        if (schoolyearStart + datetime.timedelta(days = i + 1)).weekday() == 0:
-            week += 1
+def get_schoolyear_start(schoolyear):
+    """Returns the start of the school year, adjusting if it starts on a weekend."""
+    schoolyear_start = date(schoolyear, 9, 1)
+    # If it falls on a weekend, move to the next Monday
+    while schoolyear_start.weekday() >= 5:
+        schoolyear_start += timedelta(days=1)
+    return schoolyear_start
+
+def calculate_week(today):
+    """Calculates the week number in the school year."""
+    monday = get_monday(today)
+    
+    # Determine the school year based on the current date
+    schoolyear = today.year - 1 if today.month < 8 else today.year # If the month is before September, take previous year.
+    schoolyear_start = get_schoolyear_start(schoolyear)
+    
+    # Calculate the number of Mondays between the school year start and current Monday
+    delta_days = (monday - schoolyear_start).days
+    return delta_days // 7 + 1
+
+def get_class(school, class_):
+    today = date.today()
+    monday = get_monday(today)
+    week = calculate_week(today)
             
     session = requests.Session()
     session.get("https://www.easistent.com")
@@ -35,7 +52,7 @@ def get(school, class_):
         if name != "vxcaccess":
             session.cookies.pop(name)
             
-    URL = "https://www.easistent.com/urniki/izpis/" + school + "/" + str(class_) + "/0/0/0/" + str(week)
+    URL = f"https://www.easistent.com/urniki/izpis/{school}/{class_}/0/0/0/{week}"
     response = session.get(URL)
     
     lessons = Parser.lessons(response.content)
@@ -44,10 +61,9 @@ def get(school, class_):
     return timetable
 
 def get_teacher(school, teacher):
-    today = datetime.date.today()
-    monday = today + datetime.timedelta(days = -today.weekday())
-    if today.weekday() == 5 or today.weekday() == 6: # Saturday or Sunday
-        monday += datetime.timedelta(weeks = 1)
+    today = date.today()
+    monday = get_monday(today)
+    week = calculate_week(today)
             
     session = requests.Session()
     session.get("https://www.easistent.com")
