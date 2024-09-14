@@ -66,7 +66,19 @@ def get_lessons(session, schoolId, classId=0, professorId=0, classroomId=0, week
     response = session.get(URL)
     
     return Parser.lessons(response.content)
+
+def get_student(school, class_, student):
+    today = date.today()
+    monday = get_monday(today)
+    week = calculate_week(today)
+            
+    session = get_session()
+            
+    lessons = get_lessons(session, schoolId=school, classId=class_, week=week, studentId=student)
+    timetable = Calendar.make(lessons, monday)
     
+    return timetable
+
 def get_class(school, class_):
     today = date.today()
     monday = get_monday(today)

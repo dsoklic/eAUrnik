@@ -19,6 +19,13 @@ def page_not_found(e):
     response.headers["content-type"] = "application/json"
     return response
 
+@app.route("/urniki/<string:school>/razredi/<int:class_>/dijak/<int:student>")
+def get_student(school, class_, student):
+    timetable = Timetable.get_student(school, class_, student)
+    response = make_response(timetable, 200)
+    response.headers["content-type"] = "text/calendar"
+    return response
+
 @app.route("/urniki/<string:school>/razredi/<int:class_>")
 def get_class(school, class_):
     timetable = Timetable.get_class(school, class_)
