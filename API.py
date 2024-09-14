@@ -35,17 +35,17 @@ def get_class(school, class_):
 
 @app.route("/urniki/<string:school>/ucitelj/<int:teacher>")
 def get_teacher(school, teacher):
-        timetable = Timetable.get_teacher(school, teacher)
-        response = make_response(timetable, 200)
-        response.headers["content-type"] = "text/calendar"
-        return response
+    timetable = Timetable.get_teacher(school, teacher)
+    response = make_response(timetable, 200)
+    response.headers["content-type"] = "text/calendar"
+    return response
 
 @app.route("/urniki/<string:school>/ucitelj/<int:teacher>/tednov/<int:weeks>")
 def get_teacher_weeks(school, teacher, weeks):
-        timetable = Timetable.get_teacher(school, teacher, weeks)
-        response = make_response(timetable, 200)
-        response.headers["content-type"] = "text/calendar"
-        return response
+    timetable = Timetable.get_teacher(school, teacher, weeks)
+    response = make_response(timetable, 200)
+    response.headers["content-type"] = "text/calendar"
+    return response
 
 if __name__ == "__main__":
     app.run(host = "::")
