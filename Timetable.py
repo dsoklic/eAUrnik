@@ -4,7 +4,7 @@
 #
 
 import Parser
-import Calendar
+import CalendarGenerator
 import requests
 from datetime import date, timedelta
 
@@ -75,9 +75,10 @@ def get_student(school, class_, student):
     session = get_session()
             
     lessons = get_lessons(session, schoolId=school, classId=class_, week=week, studentId=student)
-    timetable = Calendar.make(lessons, monday)
-    
-    return timetable
+
+    calendar = CalendarGenerator.CalendarGenerator()
+    calendar.append_week(lessons, monday)
+    return calendar.get_string()
 
 def get_class(school, class_):
     today = date.today()
@@ -87,9 +88,10 @@ def get_class(school, class_):
     session = get_session()
             
     lessons = get_lessons(session, schoolId=school, classId=class_, week=week)
-    timetable = Calendar.make(lessons, monday)
-    
-    return timetable
+
+    calendar = CalendarGenerator.CalendarGenerator()
+    calendar.append_week(lessons, monday)
+    return calendar.get_string()
 
 def get_teacher(school, teacher, weeks = 1):
     today = date.today()
@@ -97,9 +99,12 @@ def get_teacher(school, teacher, weeks = 1):
     current_week = calculate_week(today)
             
     session = get_session()
-    
-    lessons = get_lessons(session, schoolId=school, professorId=teacher, week=current_week)
+
+    calendar = CalendarGenerator.CalendarGenerator()
+
+    for i in range(weeks):
+        lessons_week = current_week + i - 1
+        lessons = get_lessons(session, schoolId=school, professorId=teacher, week=lessons_week)
+        calendar.append_week(lessons, monday + timedelta(weeks=i-1))
             
-    timetable = Calendar.make(lessons, monday)
-    
-    return timetable
+    return calendar.get_string()
