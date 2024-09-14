@@ -26,7 +26,7 @@ def get(school, class_):
     response.headers["content-type"] = "text/calendar"
     return response
 
-@app.route("/urniki/<string:school>/ucitelj/<string:teacher>")
+@app.route("/urniki/<string:school>/ucitelj/<int:teacher>")
 def get_teacher(school, teacher):
         timetable = Timetable.get_teacher(school, teacher)
         response = make_response(timetable, 200)

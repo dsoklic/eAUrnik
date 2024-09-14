@@ -73,20 +73,12 @@ def get_teacher(school, teacher):
         name = cookie.name
         if name != "vxcaccess":
             session.cookies.pop(name)
-            
-    URL = "https://www.easistent.com/urniki/izpis/" + school
+    
+    URL = f"https://www.easistent.com/urniki/izpis/{school}/0/{teacher}/0/0/{week}"
     response = session.get(URL)
     
-    (durations, lessons) = Parser.lessons(response.content)
-
-    lessons_copy = []
-
-    for day in lessons:
-        lessons_copy.append([])
-
-        for slot in day:
-            lessons_copy[-1].append([(subject, teach) for (subject, teach) in slot if teach == teacher])
+    lessons = Parser.lessons(response.content)
             
-    timetable = Calendar.make((durations, lessons_copy), monday)
+    timetable = Calendar.make(lessons, monday)
     
     return timetable
