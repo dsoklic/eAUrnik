@@ -38,46 +38,55 @@ def calculate_week(today):
     delta_days = (monday - schoolyear_start).days
     return delta_days // 7 + 1
 
+
+def get_session():
+    session = requests.Session()
+    session.get("https://www.easistent.com")
+    
+    # Remove all cookies except "vxcaccess", as they cause further requests to be rejected.
+    for cookie in session.cookies:
+        name = cookie.name
+        if name != "vxcaccess":
+            session.cookies.pop(name)
+
+    return session
+
+def get_lessons(session, schoolId, classId=0, professorId=0, classroomId=0, week=0, studentId=0):
+    # The IDs used in the API call are in the following order:
+    #   1. School
+    #   2. Class
+    #   3. Professor/teacher
+    #   4. Classroom
+    #   5. Not sure
+    #   6. Week
+    #   7. Student
+    #
+    # Setting any of these IDs (except the school) to 0 returns all.
+    URL = f"https://www.easistent.com/urniki/izpis/{schoolId}/{classId}/{professorId}/{classroomId}/0/{week}/{studentId}"
+    response = session.get(URL)
+    
+    return Parser.lessons(response.content)
+    
 def get_class(school, class_):
     today = date.today()
     monday = get_monday(today)
     week = calculate_week(today)
             
-    session = requests.Session()
-    session.get("https://www.easistent.com")
-    
-    # Remove all cookies except "vxcaccess", as they cause further requests to be rejected.
-    for cookie in session.cookies:
-        name = cookie.name
-        if name != "vxcaccess":
-            session.cookies.pop(name)
+    session = get_session()
             
-    URL = f"https://www.easistent.com/urniki/izpis/{school}/{class_}/0/0/0/{week}"
-    response = session.get(URL)
-    
-    lessons = Parser.lessons(response.content)
+    lessons = get_lessons(session, schoolId=school, classId=class_, week=week)
     timetable = Calendar.make(lessons, monday)
     
     return timetable
 
-def get_teacher(school, teacher):
+def get_teacher(school, teacher, weeks = 1):
     today = date.today()
     monday = get_monday(today)
-    week = calculate_week(today)
+    current_week = calculate_week(today)
             
-    session = requests.Session()
-    session.get("https://www.easistent.com")
+    session = get_session()
     
-    # Remove all cookies except "vxcaccess", as they cause further requests to be rejected.
-    for cookie in session.cookies:
-        name = cookie.name
-        if name != "vxcaccess":
-            session.cookies.pop(name)
-    
-    URL = f"https://www.easistent.com/urniki/izpis/{school}/0/{teacher}/0/0/{week}"
-    response = session.get(URL)
-    
-    lessons = Parser.lessons(response.content)
+    lessons = get_lessons(session, schoolId=school, professorId=teacher, week=current_week)
             
     timetable = Calendar.make(lessons, monday)
     
