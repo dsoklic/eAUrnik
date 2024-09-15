@@ -21,6 +21,7 @@ def page_not_found(e):
 
 @app.route("/urniki/<string:school>/razredi/<int:class_>/dijak/<int:student>")
 def get_student(school, class_, student):
+    """Parse a student's calendar."""
     timetable = Timetable.get_student(school, class_, student)
     response = make_response(timetable, 200)
     response.headers["content-type"] = "text/calendar"
@@ -28,20 +29,16 @@ def get_student(school, class_, student):
 
 @app.route("/urniki/<string:school>/razredi/<int:class_>")
 def get_class(school, class_):
+    """Parse a class's calendar."""
     timetable = Timetable.get_class(school, class_)
     response = make_response(timetable, 200)
     response.headers["content-type"] = "text/calendar"
     return response
 
 @app.route("/urniki/<string:school>/ucitelj/<int:teacher>")
-def get_teacher(school, teacher):
-    timetable = Timetable.get_teacher(school, teacher)
-    response = make_response(timetable, 200)
-    response.headers["content-type"] = "text/calendar"
-    return response
-
 @app.route("/urniki/<string:school>/ucitelj/<int:teacher>/tednov/<int:weeks>")
-def get_teacher_weeks(school, teacher, weeks):
+def get_teacher_weeks(school, teacher, weeks=1):
+    """Parse a teacher's calender for multiple weeks ahead. If number of weeks isn't specified, defaults to 1."""
     timetable = Timetable.get_teacher(school, teacher, weeks)
     response = make_response(timetable, 200)
     response.headers["content-type"] = "text/calendar"
