@@ -12,8 +12,8 @@ def parse_block(block):
     class_attribute = block.get("class")
     if "ednevnik-seznam_ur_teden-td-odpadlo" in class_attribute:
         return
-    # if "ednevnik-seznam_ur_teden-td-nadomescanje" in class_attribute:
-    #     title += " (N)"
+    if "ednevnik-seznam_ur_teden-td-nadomescanje" in class_attribute:
+        title += " (N)"
     if "ednevnik-seznam_ur_teden-td-zaposlitev" in class_attribute:
         title += " (Z)"
     icon = block.xpath("table/tr/td[2]/img")
