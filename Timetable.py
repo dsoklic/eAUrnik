@@ -31,7 +31,7 @@ def calculate_week(today):
     monday = get_monday(today)
     
     # Determine the school year based on the current date
-    schoolyear = today.year - 1 if today.month < 8 else today.year # If the month is before September, take previous year.
+    schoolyear = today.year - 1 if today.month < 9 else today.year # If the month is before September, take previous year.
     schoolyear_start = get_schoolyear_start(schoolyear)
     
     # Calculate the number of Mondays between the school year start and current Monday
