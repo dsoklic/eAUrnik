@@ -40,16 +40,7 @@ def calculate_week(today):
 
 
 def get_session():
-    session = requests.Session()
-    session.get("https://www.easistent.com")
-    
-    # Remove all cookies except "vxcaccess", as they cause further requests to be rejected.
-    for cookie in session.cookies:
-        name = cookie.name
-        if name != "vxcaccess":
-            session.cookies.pop(name)
-
-    return session
+    return requests.Session()
 
 def get_lessons(session, schoolId, classId=0, professorId=0, classroomId=0, week=0, studentId=0):
     # The IDs used in the API call are in the following order:
@@ -62,7 +53,7 @@ def get_lessons(session, schoolId, classId=0, professorId=0, classroomId=0, week
     #   7. Student
     #
     # Setting any of these IDs (except the school) to 0 returns all.
-    URL = f"https://www.easistent.com/urniki/izpis/{schoolId}/{classId}/{professorId}/{classroomId}/0/{week}/{studentId}"
+    URL = f"https://urniki.easistent.com/urniki/izpis/{schoolId}/{classId}/{professorId}/{classroomId}/0/{week}/{studentId}"
     response = session.get(URL)
     
     return Parser.lessons(response.content)

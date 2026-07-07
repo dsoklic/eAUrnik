@@ -19,23 +19,22 @@ def parse_block(block):
     icon = block.xpath("table/tr/td[2]/img")
     if icon and icon[0].get("title") in ["JV", "PB"]:
         return
-    if block.xpath("div"):
-        subtitle= block.xpath("div")[0].text.strip()
-    else:
-        subtitle = ""
+    subtitles = block.xpath(".//div[contains(@class, 'ednevnik-subtitle')]")
+    subtitle = subtitles[0].text.strip() if subtitles and subtitles[0].text else ""
     return (title, subtitle)
 
 def lessons(page):
     tree = html.fromstring(page)
-    if not tree.body.xpath("table"):
+    tables = tree.xpath('//table[@class="ednevnik-seznam_ur_teden"]')
+    if not tables:
         return
-    table = tree.body.xpath("table")[0]
+    table = tables[0]
     lines = table.xpath("tr")
 
     durations = []
     lessons = []
 
-    for i in range(1, len(lines)):
+    for i in range(0, len(lines)):
         coloumns = lines[i].xpath("td")
 
         duration = "0" + coloumns[0].xpath("div[2]")[0].text
